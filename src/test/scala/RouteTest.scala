@@ -1,16 +1,18 @@
 import akka.actor.Props
+import de.guderlei.spray.api.TodoWebServiceActor
 import de.guderlei.spray.core.TodoItemActor
 import de.guderlei.spray.database.DatabaseConfiguration
 import de.guderlei.spray.domain.TodoItem
-import org.specs2.mutable.SpecificationLike
+import org.specs2.mutable.Specification
+import org.specs2.specification.Example
+import scala.Some
 import spray.testkit.Specs2RouteTest
-import de.guderlei.spray.api._
 import spray.http.StatusCodes._
 import java.util.Date
 
 
-class MyRouteTest extends TodoWebServiceActor with SpecificationLike with Specs2RouteTest with DatabaseConfiguration {
-  def actorRefFactory = context // connect the DSL to the test ActorSystem
+class MyRouteTest extends  Specification with Specs2RouteTest with DatabaseConfiguration with TodoWebServiceActor {
+  def actorRefFactory = system // connect the DSL to the test ActorSystem
   // start the backend actor, the database is started using the DatabaseConfiguration mixin
   actorRefFactory.actorOf(Props[TodoItemActor], "todo-service")
 

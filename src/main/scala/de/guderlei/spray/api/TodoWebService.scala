@@ -1,18 +1,17 @@
 package de.guderlei.spray.api
 
-import akka.actor.{Props, Actor}
+import akka.actor.{ActorRefFactory, Props, Actor}
 import spray.routing._
 import de.guderlei.spray.core._
 import de.guderlei.spray.domain._
 import reflect.ClassTag
 import spray.httpx.Json4sSupport
 import org.json4s.DefaultFormats
+import spray.util.LoggingContext
 
 // magic import
 
-import scala.concurrent.{ExecutionContext, Future}
-import spray.httpx.marshalling.Marshaller
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 // magic import
 
@@ -20,21 +19,18 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
  * Actor to provide the routes of the rest services
  */
-class TodoWebServiceActor extends Actor with HttpService with PerRequestCreator with Json4sSupport {
+trait TodoWebServiceActor extends HttpService with PerRequestCreator with Json4sSupport {
 
-  implicit def actorRefFactory = context
+  implicit def actorRefFactory : ActorRefFactory
 
   val json4sFormats = DefaultFormats
 
-  // this actor only runs our route, but you could add
-  // other things here, like request stream processing
-  // or timeout handling
-  def receive = runRoute(itemRoute)
-
   val itemRoute =
     path("items" / LongNumber) {
+          val logger = LoggingContext.fromActorRefFactory
       id: Long =>
         get {
+          logger.debug("GET ROOT PATH")
           rejectEmptyResponse {
             handlePerRequest {
               Get(id)
@@ -70,7 +66,19 @@ class TodoWebServiceActor extends Actor with HttpService with PerRequestCreator 
 
 
   def handlePerRequest(message: RequestMessage): Route =
-    ctx => perRequest(ctx, Props[TodoItemActor], message)
+    ctx => perRequest(actorRefFactory, ctx, Props[TodoItemActor], message)
+}
+
+class TodoWebService extends Actor with TodoWebServiceActor {
+
+  implicit def actorRefFactory = context
+
+  // this actor only runs our route, but you could add
+  // other things here, like request stream processing
+  // or timeout handling
+  def receive = runRoute(itemRoute)
+
+
 }
 
 

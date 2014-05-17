@@ -25,7 +25,9 @@ libraryDependencies ++= Seq(
   "com.h2database"      %   "h2"                % "1.3.174",
   "com.jolbox"          %   "bonecp"            % "0.8.0.RELEASE",
   "mysql"               % "mysql-connector-java" % "5.1.27",
-  "org.slf4j"           %   "slf4j-simple"      % "1.7.2"
+  "org.slf4j"           %   "slf4j-simple"      % "1.7.2",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.2.3",
+"ch.qos.logback" % "logback-classic" % "1.0.9"
 )
 
 seq(Revolver.settings: _*)

@@ -58,8 +58,6 @@ object PerRequest {
 }
 
 trait PerRequestCreator {
-  this: Actor =>
-
-  def perRequest(r: RequestContext, props: Props, message: RequestMessage) =
+  def perRequest(context :ActorRefFactory, r: RequestContext, props: Props, message: RequestMessage) =
     context.actorOf(Props(new WithProps(r, props, message)))
 }
